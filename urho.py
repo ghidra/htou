@@ -2,6 +2,8 @@ import hou
 from export_urho import *
 from urho_utils import *
 #https://github.com/reattiva/Urho3D-Blender/issues/39
+
+
 def write_mdl():
 
 	#WE EXPECT NORMALS ON POINTS
@@ -24,11 +26,11 @@ def write_mdl():
 
 	for n in hou.selectedNodes():
 
-		print n.name()
+		#print n.name()
 
 		#---set up of basic urho export information
 		uModel = UrhoModel()
-		uModel.name = n.name()
+		uModel.name = str(n.name())
 
 		uGeometry = UrhoGeometry()
 		uModel.geometries.append(uGeometry)
@@ -39,7 +41,7 @@ def write_mdl():
 		uLodLevel.vertexBuffer = 0
 		uLodLevel.indexBuffer = 0
 		uLodLevel.startIndex = 0
-		uLodLevel.countIndex = 3
+		#uLodLevel.countIndex = 3
 		uGeometry.lodLevels.append(uLodLevel)
 
 		vertexBuffer = UrhoVertexBuffer()
@@ -50,6 +52,7 @@ def write_mdl():
 		indexBuffer = UrhoIndexBuffer()
 		indexBuffer.indexSize = 2
 		uModel.indexBuffers.append(indexBuffer)
+
 		#---end basic info, start filling it out
 
 		geo =  n.geometry()
@@ -65,8 +68,8 @@ def write_mdl():
 			tVertex = TVertex()
 			print str(hp[0])+":"+str(hp[1])+":"+str(hp[2])
 			print str(hn[0])+":"+str(hn[1])+":"+str(hn[2])
-			tVertex.pos = Vector((hp[0], hp[1], hp[2]))
-			tVertex.normal = Vector((hn[0], hn[1], hn[2]))
+			tVertex.pos = Vector((float(hp[0]), float(hp[1]), float(hp[2])))
+			tVertex.normal = Vector((float(hn[0]), float(hn[1]), float(hn[2])))
 
 			uVertex = UrhoVertex(tVertex)
 			vertexBuffer.updateMask(uVertex.mask)
@@ -75,6 +78,9 @@ def write_mdl():
 			uModel.boundingBox.merge(uVertex.pos)
 			uGeometry.center += uVertex.pos;
 			pcount+=1
+
+		uLodLevel.countIndex = pcount #set this so we know where how many points in this geo
+		uGeometry.center /= pcount;
 
 		#now I need to build the index buffer
 		prcount=0
@@ -85,10 +91,9 @@ def write_mdl():
 				indexBuffer.indexes.append( int(v.point().number()) )
 			#prcount+=1
 
-		uGeometry.center /= pcount;
-		print "center:"+str(uGeometry.center.x)+":"+str(uGeometry.center.y)+":"+str(uGeometry.center.z)
+		#print "center:"+str(uGeometry.center.x)+":"+str(uGeometry.center.y)+":"+str(uGeometry.center.z)
 
-		UrhoWriteModel(uModel, "/home/jimmy/projects/urho/urho_vania/bin/Resources/Models/test/htou_exported.mdl")
+		UrhoWriteModel(uModel, "/home/jimmy/projects/urho/urho_vania/bin/Resources/Models/test/"+n.name()+".mdl")
 
 		#---per geo
 		#uGeometry = UrhoGeometry()
@@ -174,3 +179,71 @@ def write_mdl_EXAMPLE():
 	uGeometry.center /= 3;
 
 	UrhoWriteModel(uModel, "/home/jimmy/projects/urho/urho_vania/bin/Resources/Models/test/tri.mdl")
+
+def write_mdl_l():
+	uModel = UrhoModel()
+	uModel.name = "triangle"
+
+	uGeometry = UrhoGeometry()
+	uModel.geometries.append(uGeometry)
+
+	uLodLevel = UrhoLodLevel()
+	uLodLevel.distance = 0.0
+	uLodLevel.primitiveType = TRIANGLE_LIST
+	uLodLevel.vertexBuffer = 0
+	uLodLevel.indexBuffer = 0
+	uLodLevel.startIndex = 0
+	uLodLevel.countIndex = 6
+	uGeometry.lodLevels.append(uLodLevel)
+
+	vertexBuffer = UrhoVertexBuffer()
+	vertexBuffer.morphMinIndex = 0
+	vertexBuffer.morphMaxIndex = 0
+	uModel.vertexBuffers.append(vertexBuffer)
+
+	#one triangle
+	indexBuffer = UrhoIndexBuffer()
+	indexBuffer.indexSize = 2
+	uModel.indexBuffers.append(indexBuffer)
+	
+
+	p = [(0.0, 0.0, 0.0),(0.0, 1.0, 0.0),(1.0, 0.0, 0.0),(1.0, 0.0, 0.0),(0.0, -1.0, 0.0),(0.0, 0.0, 0.0)]
+	for i in range(3):
+
+		tVertex = TVertex()
+		tVertex.pos = Vector(p[i])
+		tVertex.normal = Vector((0.0, 0.0, -1.0))
+
+		uVertex = UrhoVertex(tVertex)
+		vertexBuffer.updateMask(uVertex.mask)
+		vertexBuffer.vertices.append(uVertex)
+		indexBuffer.indexes.append(i)
+		uModel.boundingBox.merge(uVertex.pos)
+		uGeometry.center += uVertex.pos;
+	
+	
+
+	#two triangle
+	#indexBuffer = UrhoIndexBuffer()
+	#indexBuffer.indexSize = 2
+
+	for i in range(3):
+
+		tVertex = TVertex()
+		tVertex.pos = Vector(p[i+3])
+		tVertex.normal = Vector((0.0, 0.0, -1.0))
+
+		uVertex = UrhoVertex(tVertex)
+		vertexBuffer.updateMask(uVertex.mask)
+		vertexBuffer.vertices.append(uVertex)
+		indexBuffer.indexes.append(i+3)
+		uModel.boundingBox.merge(uVertex.pos)
+		uGeometry.center += uVertex.pos;
+
+	#uModel.indexBuffers.append(indexBuffer)
+
+	
+
+	uGeometry.center /= 6;
+
+	UrhoWriteModel(uModel, "/home/jimmy/projects/urho/urho_vania/bin/Resources/Models/test/tri2.mdl")
