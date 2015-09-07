@@ -751,11 +751,11 @@ def UrhoWriteModel(model, filename):
 				# Moprh vertex Tangent
 				if mask & ELEMENT_TANGENT:
 					fw.writeVector3(vertex.tangent)
-					
+		'''			
 	# Number of bones (may be 0)
 	fw.writeUInt(len(model.bones))
 	# For each bone
-	for bone in model.bones:
+	'''for bone in model.bones:
 		# Bone name
 		fw.writeAsciiStr(bone.name)
 		fw.writeUByte(0)

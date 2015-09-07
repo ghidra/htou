@@ -24,7 +24,12 @@ def write_mdl():
 	# Maps old vertex index to Urho vertex buffer index and Urho vertex index
 	#modelIndexMap = {}
 
+	#i need mt compressor
+	c = Float16Compressor()
+
 	for n in hou.selectedNodes():
+
+		geo =  n.geometry()
 
 		#print n.name()
 
@@ -41,7 +46,8 @@ def write_mdl():
 		uLodLevel.vertexBuffer = 0
 		uLodLevel.indexBuffer = 0
 		uLodLevel.startIndex = 0
-		#uLodLevel.countIndex = 3
+		print "number of points:"+str(len(geo.points()))
+		uLodLevel.countIndex = len(geo.points())
 		uGeometry.lodLevels.append(uLodLevel)
 
 		vertexBuffer = UrhoVertexBuffer()
@@ -55,8 +61,8 @@ def write_mdl():
 
 		#---end basic info, start filling it out
 
-		geo =  n.geometry()
-
+		#pp = [(0.0, 0.0, 0.0),(0.0, 5.0, 0.0),(5.0, 0.0, 0.0),(1.0, 0.0, 0.0),(0.0, -1.0, 0.0),(0.0, 0.0, 0.0)]
+		#pp = [(6.0, 1.0, -3.0),(4.0, 0.2, 2.0),(-2.0, 0.1, 6.0),(1.0, 0.0, 0.0),(0.0, -1.0, 0.0),(0.0, 0.0, 0.0)]
 		#verticies are the number of points
 		#totalVertices=len(geo.points())
 		pcount=0
@@ -64,12 +70,29 @@ def write_mdl():
 
 			hp = p.position()
 			hn = p.attribValue("N")
+			#hp = pp[pcount]
+			#hn = (0.0,0.0,-1.0)
+
+			'''px = c.compress(hp[0])
+			py = c.compress(hp[1])
+			pz = c.compress(hp[2])
+			nx = c.compress(hn[0])
+			ny = c.compress(hn[1])
+			nz = c.compress(hn[2])'''
+
+			px = hp[0]
+			py = hp[1]
+			pz = hp[2]
+			nx = hn[0]
+			ny = hn[1]
+			nz = hn[2]
 			
 			tVertex = TVertex()
-			print str(hp[0])+":"+str(hp[1])+":"+str(hp[2])
-			print str(hn[0])+":"+str(hn[1])+":"+str(hn[2])
-			tVertex.pos = Vector((float(hp[0]), float(hp[1]), float(hp[2])))
-			tVertex.normal = Vector((float(hn[0]), float(hn[1]), float(hn[2])))
+			print "P:"+str(px)+":"+str(py)+":"+str(pz)
+			print "N:"+str(nx)+":"+str(ny)+":"+str(nz)
+			#tVertex.pos = Vector(p.attribValue("P"))
+			tVertex.pos = Vector((px, py, pz))
+			tVertex.normal = Vector((nx, ny, nz))
 
 			uVertex = UrhoVertex(tVertex)
 			vertexBuffer.updateMask(uVertex.mask)
@@ -79,8 +102,13 @@ def write_mdl():
 			uGeometry.center += uVertex.pos;
 			pcount+=1
 
-		uLodLevel.countIndex = pcount #set this so we know where how many points in this geo
-		uGeometry.center /= pcount;
+		#uLodLevel.countIndex = pcount #set this so we know where how many points in this geo
+		#uGeometry.center /= pcount;
+		uGeometry.center = Vector(( ((uModel.boundingBox.min.x+uModel.boundingBox.max.x)/2.0),((uModel.boundingBox.min.y+uModel.boundingBox.max.y)/2.0),((uModel.boundingBox.min.z+uModel.boundingBox.max.z)/2.0) ))
+
+		print "center:"+str(uGeometry.center.x)+":"+str(uGeometry.center.y)+":"+str(uGeometry.center.z)
+		print "bbmin:"+str(uModel.boundingBox.min.x)+":"+str(uModel.boundingBox.min.y)+":"+str(uModel.boundingBox.min.z)
+		print "bbmax:"+str(uModel.boundingBox.max.x)+":"+str(uModel.boundingBox.max.y)+":"+str(uModel.boundingBox.max.z)
 
 		#now I need to build the index buffer
 		prcount=0
