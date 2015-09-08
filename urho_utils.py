@@ -3,7 +3,6 @@
 # This script is licensed as public domain.
 #
 
-# http://docs.python.org/2/library/struct.html
 
 from xml.etree import ElementTree as ET
 from xml.dom import minidom
@@ -12,7 +11,6 @@ import os
 import struct
 import array
 import logging
-import binascii
 
 log = logging.getLogger("ExportLogger")
 
@@ -247,140 +245,28 @@ class BinaryFileWriter:
 
 	# Writes an ASCII string without terminator
 	def writeAsciiStr(self, v):
-		#self.buffer.extend(bytes(v, "ascii"))
-		#a = array.array("B",v)
 		self.buffer.extend(array.array("B",bytearray(v, "ascii")))
-		#self.buffer.extend(bytearray(v, "ascii"))
 
 	# Writes a 32 bits unsigned int
 	def writeUInt(self, v):
-		#a=[]
-		#a.append(struct.unpack("<I",struct.pack("<I", v)))
-		#self.buffer.extend(struct.pack("<I", v))
-		#self.buffer.extend(list(itertools.chain.from_iterable(a)))
-		a = array.array("B",struct.pack("<I", v))
-		self.buffer.extend(a)
-		#self.buffer.extend(bytearray.fromhex(struct.pack("<I", v)))
+		self.buffer.extend(array.array("B",struct.pack("<I", v)))
 
 	# Writes a 16 bits unsigned int
 	def writeUShort(self, v):
-		#a=[]
-		#a.append(struct.unpack("<H",struct.pack("<H", v)))
-		#self.buffer.extend(struct.pack("<H", v))
-		#self.buffer.extend(list(itertools.chain.from_iterable(a)))
-		a = array.array("B",struct.pack("<H", v))
-		self.buffer.extend(a)
-		#self.buffer.extend(bytearray.fromhex(struct.pack("<H", v)))
+		self.buffer.extend(array.array("B",struct.pack("<H", v)))
 
 	# Writes one 8 bits unsigned byte
 	def writeUByte(self, v):
-		#a=[]
-		#a.append(struct.unpack("<B",struct.pack("<B", v)))
-		#self.buffer.extend(list(itertools.chain.from_iterable(a)))
-		a = array.array("B",struct.pack("<B", v))
-		self.buffer.extend(a)
-		#self.buffer.extend(bytearray.fromhex(struct.pack("<B", v)))
+		self.buffer.extend(array.array("B",struct.pack("<B", v)))
 
 	# Writes four 32 bits floats .w .x .y .z
 	def writeQuaternion(self, v):
-		#a=[]
-		#a.append(struct.unpack("<4I",struct.pack("<4f", v.w, v.x, v.y, v.z)))
-		#self.buffer.extend(struct.pack("<4f", v.w, v.x, v.y, v.z))
-		#self.buffer.extend(list(itertools.chain.from_iterable(a)))
-		a = array.array("B",struct.pack("<4f", v.w, v.x, v.y, v.z))
-		self.buffer.extend(a)
-		#self.buffer.extend(bytearray.fromhex(struct.pack("<4f", v.w, v.x, v.y, v.z)))
+		self.buffer.extend(array.array("B",struct.pack("<4f", v.w, v.x, v.y, v.z)))
 
 	# Writes three 32 bits floats .x .y .z
 	def writeVector3(self, v):
-		#a=[]
-		#a.append(struct.unpack("<3I",struct.pack("<3f", v.x, v.y, v.z)))
-		#self.buffer.extend(struct.pack("<3f", v.x, v.y, v.z))
-		#self.buffer.extend(list(itertools.chain.from_iterable(a)))
-		a = array.array("B",struct.pack("<3f", v.x, v.y, v.z))
-		self.buffer.extend(a)
-		#self.buffer.extend(bytearray.fromhex(struct.pack("<3f", v.x, v.y, v.z)))
+		self.buffer.extend(array.array("B",struct.pack("<3f", v.x, v.y, v.z)))
+
 	# Writes a 32 bits float
 	def writeFloat(self, v):
-		#a=[]
-		#a.append(struct.unpack("<I",struct.pack("<f", v)))
-		#self.buffer.extend(struct.pack("<f", v))
-		#self.buffer.extend(list(itertools.chain.from_iterable(a)))
-		a = array.array("B",struct.pack("<f", v))
-		self.buffer.extend(a)
-		#self.buffer.extend(bytearray.fromhex(struct.pack("<f", v)))
-
-##-----float 32 to 16 bits
-'''
-#read half float from file and print float
-h = struct.unpack(">H",file.read(struct.calcsize(">H")))[0]
-fcomp = Float16Compressor()
-temp = fcomp.decompress(h)
-str = struct.pack('I',temp)
-f = struct.unpack('f',str)[0]
-print(f)
-
-#write half float to file from float
-fcomp = Float16Compressor()
-f16 = fcomp.compress(float32)
-file.write(struct.pack(">H",f16))
-'''
-class Float16Compressor:
-    def __init__(self):
-        self.temp = 0
-
-    def compress(self,float32):
-        F16_EXPONENT_BITS = 0x1F
-        F16_EXPONENT_SHIFT = 10
-        F16_EXPONENT_BIAS = 15
-        F16_MANTISSA_BITS = 0x3ff
-        F16_MANTISSA_SHIFT =  (23 - F16_EXPONENT_SHIFT)
-        F16_MAX_EXPONENT =  (F16_EXPONENT_BITS << F16_EXPONENT_SHIFT)
-
-        a = struct.pack('>f',float32)
-        b = binascii.hexlify(a)
-
-        f32 = int(b,16)
-        f16 = 0
-        sign = (f32 >> 16) & 0x8000
-        exponent = ((f32 >> 23) & 0xff) - 127
-        mantissa = f32 & 0x007fffff
-
-        if exponent == 128:
-            f16 = sign | F16_MAX_EXPONENT
-            if mantissa:
-                f16 |= (mantissa & F16_MANTISSA_BITS)
-        elif exponent > 15:
-            f16 = sign | F16_MAX_EXPONENT
-        elif exponent > -15:
-            exponent += F16_EXPONENT_BIAS
-            mantissa >>= F16_MANTISSA_SHIFT
-            f16 = sign | exponent << F16_EXPONENT_SHIFT | mantissa
-        else:
-            f16 = sign
-        return f16
-
-    def decompress(self,float16):
-        s = int((float16 >> 15) & 0x00000001)    # sign
-        e = int((float16 >> 10) & 0x0000001f)    # exponent
-        f = int(float16 & 0x000003ff)            # fraction
-
-        if e == 0:
-            if f == 0:
-                return int(s << 31)
-            else:
-                while not (f & 0x00000400):
-                    f = f << 1
-                    e -= 1
-                e += 1
-                f &= ~0x00000400
-                #print(s,e,f)
-        elif e == 31:
-            if f == 0:
-                return int((s << 31) | 0x7f800000)
-            else:
-                return int((s << 31) | 0x7f800000 | (f << 13))
-
-        e = e + (127 -15)
-        f = f << 13
-        return int((s << 31) | (e << 23) | f)
+		self.buffer.extend(array.array("B",struct.pack("<f", v)))

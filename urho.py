@@ -46,8 +46,8 @@ def write_mdl():
 		uLodLevel.vertexBuffer = 0
 		uLodLevel.indexBuffer = 0
 		uLodLevel.startIndex = 0
-		print "number of points:"+str(len(geo.points()))
-		uLodLevel.countIndex = len(geo.points())
+		#print "number of points:"+str(len(geo.points()))
+		#uLodLevel.countIndex = len(geo.points())
 		uGeometry.lodLevels.append(uLodLevel)
 
 		vertexBuffer = UrhoVertexBuffer()
@@ -111,15 +111,19 @@ def write_mdl():
 		print "bbmax:"+str(uModel.boundingBox.max.x)+":"+str(uModel.boundingBox.max.y)+":"+str(uModel.boundingBox.max.z)
 
 		#now I need to build the index buffer
-		prcount=0
+		#prcount=0
+		pcount=0
 		for pr in geo.prims():
 			#print "triangle:"+str(prcount)
-			for v in pr.vertices():
+			#the poly winding is reversed in urho compared to houdini, instead of requiring user to reverse in h, do it here
+			for v in reversed(pr.vertices()):
+				pcount+=1
 				#print v.point().number()
 				indexBuffer.indexes.append( int(v.point().number()) )
 			#prcount+=1
 
 		#print "center:"+str(uGeometry.center.x)+":"+str(uGeometry.center.y)+":"+str(uGeometry.center.z)
+		uLodLevel.countIndex = pcount# the total number of all points for all polys...
 
 		UrhoWriteModel(uModel, "/mill3d/work/jimmyg/urho/urho_vania/bin/Resources/Models/test/"+n.name()+".mdl")
 		#UrhoWriteModel(uModel, "/home/jimmy/projects/urho/urho_vania/bin/Resources/Models/test/"+n.name()+".mdl")
