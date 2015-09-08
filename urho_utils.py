@@ -213,6 +213,7 @@ def WriteXmlFile(xmlContent, filepath, fOptions):
 #--------------------
 # Binary writers
 #--------------------
+#http://stackoverflow.com/questions/5649407/hexadecimal-string-to-byte-array-in-python
 
 class BinaryFileWriter:
 
@@ -247,7 +248,9 @@ class BinaryFileWriter:
 	# Writes an ASCII string without terminator
 	def writeAsciiStr(self, v):
 		#self.buffer.extend(bytes(v, "ascii"))
-		self.buffer.extend(bytearray(v, "ascii"))
+		#a = array.array("B",v)
+		self.buffer.extend(array.array("B",bytearray(v, "ascii")))
+		#self.buffer.extend(bytearray(v, "ascii"))
 
 	# Writes a 32 bits unsigned int
 	def writeUInt(self, v):
@@ -255,7 +258,9 @@ class BinaryFileWriter:
 		#a.append(struct.unpack("<I",struct.pack("<I", v)))
 		#self.buffer.extend(struct.pack("<I", v))
 		#self.buffer.extend(list(itertools.chain.from_iterable(a)))
-		self.buffer.extend(bytearray(struct.pack("<I", v)))
+		a = array.array("B",struct.pack("<I", v))
+		self.buffer.extend(a)
+		#self.buffer.extend(bytearray.fromhex(struct.pack("<I", v)))
 
 	# Writes a 16 bits unsigned int
 	def writeUShort(self, v):
@@ -263,14 +268,18 @@ class BinaryFileWriter:
 		#a.append(struct.unpack("<H",struct.pack("<H", v)))
 		#self.buffer.extend(struct.pack("<H", v))
 		#self.buffer.extend(list(itertools.chain.from_iterable(a)))
-		self.buffer.extend(bytearray(struct.pack("<H", v)))
+		a = array.array("B",struct.pack("<H", v))
+		self.buffer.extend(a)
+		#self.buffer.extend(bytearray.fromhex(struct.pack("<H", v)))
 
 	# Writes one 8 bits unsigned byte
 	def writeUByte(self, v):
 		#a=[]
 		#a.append(struct.unpack("<B",struct.pack("<B", v)))
 		#self.buffer.extend(list(itertools.chain.from_iterable(a)))
-		self.buffer.extend(bytearray(struct.pack("<B", v)))
+		a = array.array("B",struct.pack("<B", v))
+		self.buffer.extend(a)
+		#self.buffer.extend(bytearray.fromhex(struct.pack("<B", v)))
 
 	# Writes four 32 bits floats .w .x .y .z
 	def writeQuaternion(self, v):
@@ -278,7 +287,9 @@ class BinaryFileWriter:
 		#a.append(struct.unpack("<4I",struct.pack("<4f", v.w, v.x, v.y, v.z)))
 		#self.buffer.extend(struct.pack("<4f", v.w, v.x, v.y, v.z))
 		#self.buffer.extend(list(itertools.chain.from_iterable(a)))
-		self.buffer.extend(bytearray(struct.pack("<4f", v.w, v.x, v.y, v.z)))
+		a = array.array("B",struct.pack("<4f", v.w, v.x, v.y, v.z))
+		self.buffer.extend(a)
+		#self.buffer.extend(bytearray.fromhex(struct.pack("<4f", v.w, v.x, v.y, v.z)))
 
 	# Writes three 32 bits floats .x .y .z
 	def writeVector3(self, v):
@@ -286,14 +297,18 @@ class BinaryFileWriter:
 		#a.append(struct.unpack("<3I",struct.pack("<3f", v.x, v.y, v.z)))
 		#self.buffer.extend(struct.pack("<3f", v.x, v.y, v.z))
 		#self.buffer.extend(list(itertools.chain.from_iterable(a)))
-		self.buffer.extend(bytearray(struct.pack("<3f", v.x, v.y, v.z)))
+		a = array.array("B",struct.pack("<3f", v.x, v.y, v.z))
+		self.buffer.extend(a)
+		#self.buffer.extend(bytearray.fromhex(struct.pack("<3f", v.x, v.y, v.z)))
 	# Writes a 32 bits float
 	def writeFloat(self, v):
 		#a=[]
 		#a.append(struct.unpack("<I",struct.pack("<f", v)))
 		#self.buffer.extend(struct.pack("<f", v))
 		#self.buffer.extend(list(itertools.chain.from_iterable(a)))
-		self.buffer.extend(bytearray(struct.pack("<f", v)))
+		a = array.array("B",struct.pack("<f", v))
+		self.buffer.extend(a)
+		#self.buffer.extend(bytearray.fromhex(struct.pack("<f", v)))
 
 ##-----float 32 to 16 bits
 '''

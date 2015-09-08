@@ -31,7 +31,7 @@ def write_mdl():
 
 		geo =  n.geometry()
 
-		#print n.name()
+		print n.name()
 
 		#---set up of basic urho export information
 		uModel = UrhoModel()
@@ -113,15 +113,16 @@ def write_mdl():
 		#now I need to build the index buffer
 		prcount=0
 		for pr in geo.prims():
-			print "triangle:"+str(prcount)
+			#print "triangle:"+str(prcount)
 			for v in pr.vertices():
-				print v.point().number()
+				#print v.point().number()
 				indexBuffer.indexes.append( int(v.point().number()) )
 			#prcount+=1
 
 		#print "center:"+str(uGeometry.center.x)+":"+str(uGeometry.center.y)+":"+str(uGeometry.center.z)
 
-		UrhoWriteModel(uModel, "/home/jimmy/projects/urho/urho_vania/bin/Resources/Models/test/"+n.name()+".mdl")
+		UrhoWriteModel(uModel, "/mill3d/work/jimmyg/urho/urho_vania/bin/Resources/Models/test/"+n.name()+".mdl")
+		#UrhoWriteModel(uModel, "/home/jimmy/projects/urho/urho_vania/bin/Resources/Models/test/"+n.name()+".mdl")
 
 		#---per geo
 		#uGeometry = UrhoGeometry()
