@@ -7,25 +7,12 @@ from urho_utils import *
 def write_mdl():
 
 	#WE EXPECT NORMALS ON POINTS
-	#WE EXPECT UVS ON POINTS
+	#WE EXPECT UVS ON POINTS (not yet)
 	#WE EXPECT TRIANGULATION
 
-	#uExportData = UrhoExportData()
-	#uModel = UrhoModel()
-	#uModel.name = hou.expandString("$HIPNAME:r")#"test"#tData.objectName
-	#uExportData.models.append(uModel)
-
-	#totalVertices = 0 #len(geo.points())
-
-	# Urho lod vertex buffer
-	#vertexBuffer = None
-	# Urho lod index buffer
-	#indexBuffer = None
-	# Maps old vertex index to Urho vertex buffer index and Urho vertex index
-	#modelIndexMap = {}
-
-	#i need mt compressor
-	c = Float16Compressor()
+	#first lest find out where you want to save this
+	path = hou.ui.selectFile(title="pick save location")
+	path = hou.expandString(path)
 
 	for n in hou.selectedNodes():
 
@@ -59,26 +46,11 @@ def write_mdl():
 		indexBuffer.indexSize = 2
 		uModel.indexBuffers.append(indexBuffer)
 
-		#---end basic info, start filling it out
-
-		#pp = [(0.0, 0.0, 0.0),(0.0, 5.0, 0.0),(5.0, 0.0, 0.0),(1.0, 0.0, 0.0),(0.0, -1.0, 0.0),(0.0, 0.0, 0.0)]
-		#pp = [(6.0, 1.0, -3.0),(4.0, 0.2, 2.0),(-2.0, 0.1, 6.0),(1.0, 0.0, 0.0),(0.0, -1.0, 0.0),(0.0, 0.0, 0.0)]
-		#verticies are the number of points
-		#totalVertices=len(geo.points())
 		pcount=0
 		for p in geo.points():
 
 			hp = p.position()
 			hn = p.attribValue("N")
-			#hp = pp[pcount]
-			#hn = (0.0,0.0,-1.0)
-
-			'''px = c.compress(hp[0])
-			py = c.compress(hp[1])
-			pz = c.compress(hp[2])
-			nx = c.compress(hn[0])
-			ny = c.compress(hn[1])
-			nz = c.compress(hn[2])'''
 
 			px = hp[0]
 			py = hp[1]
@@ -88,16 +60,12 @@ def write_mdl():
 			nz = hn[2]
 			
 			tVertex = TVertex()
-			print "P:"+str(px)+":"+str(py)+":"+str(pz)
-			print "N:"+str(nx)+":"+str(ny)+":"+str(nz)
-			#tVertex.pos = Vector(p.attribValue("P"))
 			tVertex.pos = Vector((px, py, pz))
 			tVertex.normal = Vector((nx, ny, nz))
 
 			uVertex = UrhoVertex(tVertex)
 			vertexBuffer.updateMask(uVertex.mask)
 			vertexBuffer.vertices.append(uVertex)
-			#indexBuffer.indexes.append(pcount)
 			uModel.boundingBox.merge(uVertex.pos)
 			uGeometry.center += uVertex.pos;
 			pcount+=1
@@ -111,44 +79,20 @@ def write_mdl():
 		print "bbmax:"+str(uModel.boundingBox.max.x)+":"+str(uModel.boundingBox.max.y)+":"+str(uModel.boundingBox.max.z)
 
 		#now I need to build the index buffer
-		#prcount=0
 		pcount=0
 		for pr in geo.prims():
-			#print "triangle:"+str(prcount)
 			#the poly winding is reversed in urho compared to houdini, instead of requiring user to reverse in h, do it here
 			for v in reversed(pr.vertices()):
 				pcount+=1
-				#print v.point().number()
 				indexBuffer.indexes.append( int(v.point().number()) )
 			#prcount+=1
 
-		#print "center:"+str(uGeometry.center.x)+":"+str(uGeometry.center.y)+":"+str(uGeometry.center.z)
 		uLodLevel.countIndex = pcount# the total number of all points for all polys...
 
-		UrhoWriteModel(uModel, "/mill3d/work/jimmyg/urho/urho_vania/bin/Resources/Models/test/"+n.name()+".mdl")
+		UrhoWriteModel(uModel, path+n.name()+".mdl")
+		#UrhoWriteModel(uModel, "/mill3d/work/jimmyg/urho/urho_vania/bin/Resources/Models/test/"+n.name()+".mdl")
 		#UrhoWriteModel(uModel, "/home/jimmy/projects/urho/urho_vania/bin/Resources/Models/test/"+n.name()+".mdl")
 
-		#---per geo
-		#uGeometry = UrhoGeometry()
-		#uModel.geometries.append(uGeometry)
-		#geomIndex = len(uModel.geometries) - 1
-
-		# Material name (can be None)
-		#uGeometry.uMaterialName = "none"#tGeometry.materialName
-		
-		# Start value for geometry center (one for each geometry)
-		
-		# Set of remapped vertices
-		#remappedVertices = set()
-
-		#print totalVertices
-
-
-	
-
-	#totalVertices = len(tData.verticesList)
-
-	#print uExportData.models[0].name
 
 def write_mdl_EXAMPLE():
 	
