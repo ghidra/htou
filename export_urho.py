@@ -66,6 +66,13 @@ class Vector:
 		self.y=v[1]
 		self.z=v[2]
 		self.w=v[3] if len(v)>3 else 1.0
+	def __getitem__(self,i):
+		return {
+        	'0': self.x,
+        	'1': self.y,
+        	'2': self.z,
+        	'3': self.w,
+    	}.get(i,0)
 	def __add__(self,v):
 		return Vector(self.x+v.x,self.y+v.y,self.z+v.z,self.w+v.w)
 	def __sub__(self,v):
@@ -158,7 +165,7 @@ class TVertex:
         self.bitangent = None
         # Bones weights: list of tuple(boneIndex, weight)
         self.weights = None
-'''
+
     # returns True is this vertex is a changed morph of vertex 'other'
     def isMorphed(self, other):
         # TODO: compare floats with a epsilon margin?
@@ -211,7 +218,7 @@ class TVertex:
             s += "\n weights: "
             for w in self.weights:
                 s += "{:d} {:.3f}  ".format(w[0],w[1])
-        return s'''
+        return s
 
 #--------------------
 # Classes
@@ -241,7 +248,7 @@ class BoundingBox:
 		if point.z > self.max.z:
 			self.max.z = point.z
 
-'''
+
 # Exception for a vertex with more or less elements than its vertex buffer
 class VertexMaskError(Exception):
 
@@ -283,7 +290,7 @@ class FrameMaskError(Exception):
 		txt = "{:04X} AND {:04X} = {:04X}".format(self.oldMask, self.disruptMask, self.newMask)
 		txt += "\n differences: {:s}".format(", ".join(names))
 		return txt
-'''
+
 # --- Model classes ---
 
 class UrhoVertex:
@@ -434,7 +441,7 @@ class UrhoGeometry:
 		self.center = Vector((0.0, 0.0, 0.0))
 		# Name of the material used (only for materials list)
 		self.uMaterialName = None
-'''		
+		
 class UrhoVertexMorph:
 	def __init__(self):
 		 # Morph name
@@ -466,7 +473,7 @@ class UrhoBone:
 		self.collisionMask = 0
 		self.radius = None
 		self.boundingBox = BoundingBox()
-'''
+
 class UrhoModel:
 	def __init__(self):
 		# Model name
@@ -485,7 +492,7 @@ class UrhoModel:
 		self.boundingBox = BoundingBox()
 		
 # --- Animation classes ---
-'''
+
 class UrhoKeyframe:
 	def __init__(self, tKeyframe):
 		# Bit mask of elements present
@@ -616,7 +623,7 @@ class UrhoExportOptions:
 		self.splitSubMeshes = False
 		self.useStrictLods = True
 
-'''
+
 #--------------------
 # Writers
 #--------------------
@@ -661,14 +668,23 @@ def UrhoWriteModel(model, filename):
 			if mask & ELEMENT_NORMAL:
 				fw.writeVector3(vertex.normal)
 			if mask & ELEMENT_COLOR:
-				for i in range(4):
-					fw.writeUByte(vertex.color[i])
+				#the __getitem__ not working, lets do this manually
+				fw.writeUByte(vertex.color.x)
+				fw.writeUByte(vertex.color.y)
+				fw.writeUByte(vertex.color.z)
+				fw.writeUByte(vertex.color.w)
+				#for i in range(4):
+				#	fw.writeUByte(vertex.color[i])
 			if mask & ELEMENT_UV1:
-				for i in range(2):
-					fw.writeFloat(vertex.uv[i])
+				fw.writeFloat(vertex.uv.x)
+				fw.writeFloat(vertex.uv.y)
+				#for i in range(2):
+				#	fw.writeFloat(vertex.uv[i])
 			if mask & ELEMENT_UV2:
-				for i in range(2):
-					fw.writeFloat(vertex.uv2[i])
+				fw.writeFloat(vertex.uv2.x)
+				fw.writeFloat(vertex.uv2.y)
+				#for i in range(2):
+				#	fw.writeFloat(vertex.uv2[i])
 			if mask & ELEMENT_TANGENT:
 				fw.writeVector3(vertex.tangent)
 				fw.writeFloat(vertex.tangent.w)
@@ -723,7 +739,7 @@ def UrhoWriteModel(model, filename):
 	# Number of morphs
 	fw.writeUInt(len(model.morphs))
 	# For each morph
-	'''for morph in model.morphs:
+	for morph in model.morphs:
 		# Name of morph
 		fw.writeAsciiStr(morph.name)
 		fw.writeUByte(0)
@@ -751,7 +767,7 @@ def UrhoWriteModel(model, filename):
 				# Moprh vertex Tangent
 				if mask & ELEMENT_TANGENT:
 					fw.writeVector3(vertex.tangent)
-		'''			
+		
 	# Number of bones (may be 0)
 	fw.writeUInt(len(model.bones))
 	# For each bone

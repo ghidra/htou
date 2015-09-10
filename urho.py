@@ -3,6 +3,9 @@ from export_urho import *
 from urho_utils import *
 #https://github.com/reattiva/Urho3D-Blender/issues/39
 
+def clamp(v,low,high):
+	return max(low, min(high, v))
+
 
 def write_mdl():
 
@@ -11,12 +14,19 @@ def write_mdl():
 	#WE EXPECT TRIANGULATION
 
 	#first lest find out where you want to save this
-	path = hou.ui.selectFile(title="pick save location")
-	path = hou.expandString(path)
 
 	for n in hou.selectedNodes():
 
 		geo =  n.geometry()
+
+		#get path per node
+		apath = geo.findGlobalAttrib("path")
+		if(apath):
+			path = geo.attribValue(apath)
+		else:
+			path = hou.ui.selectFile(title="pick save location")
+			path = hou.expandString(path)
+
 
 		print n.name()
 
@@ -51,17 +61,37 @@ def write_mdl():
 
 			hp = p.position()
 			hn = p.attribValue("N")
-
-			px = hp[0]
-			py = hp[1]
-			pz = hp[2]
-			nx = hn[0]
-			ny = hn[1]
-			nz = hn[2]
+			#get color if we have it
+			
 			
 			tVertex = TVertex()
-			tVertex.pos = Vector((px, py, pz))
-			tVertex.normal = Vector((nx, ny, nz))
+			tVertex.pos = Vector((hp[0], hp[1], hp[2]))
+			tVertex.normal = Vector((hn[0], hn[1], hn[2]))
+
+			#color
+			cd = geo.findPointAttrib("Cd")
+			cda = geo.findPointAttrib("Alpha")
+			if(cd):
+				hcd = p.attribValue(cd)
+				alpha = 0
+				if(cda):
+					halpha = p.attribValue(cda)
+					halpha = clamp(int(halpha*255),0,255)
+				print halpha
+				tVertex.color = Vector(( clamp(int(hcd[0]*255),0,255), clamp(int(hcd[1]*255),0,255), clamp(int(hcd[2]*255),0,255), halpha))
+
+			#uv
+			uv = geo.findPointAttrib("uv")
+			if(uv):
+				huv = p.attribValue(uv)
+				tVertex.uv = Vector((huv[0], huv[1],0.0))
+
+			#uv2
+			uv2 = geo.findPointAttrib("uv2")
+			if(uv2):
+				huv = p.attribValue(uv2)
+				tVertex.uv2 = Vector((huv2[0], huv2[1],0.0))
+
 
 			uVertex = UrhoVertex(tVertex)
 			vertexBuffer.updateMask(uVertex.mask)
@@ -93,8 +123,7 @@ def write_mdl():
 		#UrhoWriteModel(uModel, "/mill3d/work/jimmyg/urho/urho_vania/bin/Resources/Models/test/"+n.name()+".mdl")
 		#UrhoWriteModel(uModel, "/home/jimmy/projects/urho/urho_vania/bin/Resources/Models/test/"+n.name()+".mdl")
 
-
-def write_mdl_EXAMPLE():
+'''def write_mdl_EXAMPLE():
 	
 	uModel = UrhoModel()
 	uModel.name = "triangle"
@@ -224,3 +253,4 @@ def write_mdl_l():
 	uGeometry.center /= 6;
 
 	UrhoWriteModel(uModel, "/home/jimmy/projects/urho/urho_vania/bin/Resources/Models/test/tri2.mdl")
+	'''
