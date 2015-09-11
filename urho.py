@@ -73,11 +73,11 @@ def write_mdl():
 			cda = geo.findPointAttrib("Alpha")
 			if(cd):
 				hcd = p.attribValue(cd)
-				alpha = 0
+				halpha = 0
 				if(cda):
 					halpha = p.attribValue(cda)
 					halpha = clamp(int(halpha*255),0,255)
-				print halpha
+					#print halpha
 				tVertex.color = Vector(( clamp(int(hcd[0]*255),0,255), clamp(int(hcd[1]*255),0,255), clamp(int(hcd[2]*255),0,255), halpha))
 
 			#uv
