@@ -182,6 +182,7 @@ def Vector4ToString(vector):
 
 def XmlToPrettyString(elem):
 	rough = ET.tostring(elem, 'utf-8')
+	#rough = ET.tostring(elem)
 	reparsed = minidom.parseString(rough)
 	pretty = reparsed.toprettyxml(indent="\t")
 	i = pretty.rfind("?>")
