@@ -21,12 +21,12 @@ def gen_component(d,t):
 	return component
 
 #-------
-def test(l):
-	for attributes in l:
+def test():
+	for n in hou.selectedNodes():
 		print attributes
-		for attrib in attributes:
+		for attrib in n.attribs():
 		#for attrib in l[attributes]:
-			print str(attrib)+"_"+str(attributes[attrib])
+			print attrib.name()
 #-------
 def node_data(n):
 	t = n.outputs()[0]
