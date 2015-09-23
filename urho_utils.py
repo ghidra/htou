@@ -196,7 +196,7 @@ def XmlToPrettyString(elem):
 #--------------------
 
 # Write XML to a text file
-def WriteXmlFile(xmlContent, filepath, fOptions):
+def WriteXmlFile(xmlContent, filepath):
 	try:
 		file = open(filepath, "w")
 	except Exception as e:

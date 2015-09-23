@@ -99,8 +99,15 @@ def make_parms():
 
 		comp[ctype](n)
 
+#test
 def read_parms():
 	for n in hou.selectedNodes():
-		for p in n.parms():
-		#for attrib in l[attributes]:
-			print p.name()
+		for p in n.spareParms():
+			if not p.isAtDefault() :
+				
+				print p.description()
+				print p.parmTemplate().type()
+				if(p.parmTemplate().type() == hou.parmTemplateType.Menu):
+					print p.menuLabels()[p.eval()]
+				else:
+					print p.eval()

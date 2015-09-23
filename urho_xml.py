@@ -1,6 +1,7 @@
 import hou
 from xml.etree import ElementTree as xml
 from urho_utils import XmlToPrettyString as tostring
+from urho_utils import WriteXmlFile as WriteXml
 
 count_node=16777216
 def gen_node(d):
@@ -31,14 +32,14 @@ def test():
 def node_data(n):
 	t = n.outputs()[0]
 	q=hou.Quaternion()
-	q.setToEulerRotates( (t.parm("rx").eval(),t.parm("rz").eval(),t.parm("rz").eval()) )
+	q.setToEulerRotates( (t.parm("rx").eval(),t.parm("ry").eval(),t.parm("rz").eval()) )
 	scl=hou.Vector3( (t.parm("sx").eval(),t.parm("sz").eval(),t.parm("sz").eval()) )
 	scl*=t.parm("scale").eval()
 	attribs = [
 		{"name":"Is Enabled","value":"true"},
 		{"name":"Name","value":n.name()[5:]},
 		{"name":"Position","value":str(t.parm("tx").eval())+" "+str(t.parm("ty").eval())+" "+str(t.parm("tz").eval())},
-		{"name":"Rotation","value":str(q[0])+" "+str(q[1])+" "+str(q[2])+" "+str(q[3])},
+		{"name":"Rotation","value":str(q[3])+" "+str(q[0])+" "+str(q[1])+" "+str(q[2])},
 		{"name":"Scale","value":str(scl[0])+" "+str(scl[1])+" "+str(scl[2])},
 		{"name":"Variables"}
 	]
@@ -48,47 +49,30 @@ def node_data(n):
 def gen_attribute(e,d):#element, and data
 	xml.SubElement(e,'attribute',d)
 
-#component switch case
-def c_staticmodel(n):
-	#grab the first input, and export it too, get the name for the model
-	#get data off it for materials, and whatever else
-	attribs = [
-		{"name":"Model","value":"Model:Models/"},
-		{"name":"Material","value":"Material:Materials/"}
-	]
-	#model and materials for now
-	return attribs
+def component_data(n):
+	#bring in the node
+	attribs=[]
+	for p in n.spareParms():
+		if not p.isAtDefault():
+			sub = {}
+			sub["name"]=p.description()
+			if(p.parmTemplate().type() == hou.parmTemplateType.Menu):
+				sub["value"] = p.menuLabels()[p.eval()]
+				#print sub["value"]
+			else:
+				if p.description() in ("Model","Material"):
+					#i have to prepend this for these
+					#print "prepend"
+					sub["value"] = p.description()+";"+p.evalAsString()
+				else:
+					sub["value"] = p.evalAsString()
+			
+			attribs.append(sub)
 
-def c_rigidbody(n):
-	#friction collision layer collision mask
-	attribs = [
-		{"name":"Friction","value":str(0.1)},
-		{"name":"Collision Layer","value":str(32)},
-		{"name":"Collision Mask","value":str(63)},
-	]
-	#model and materials for now
-	return attribs
 
-def c_collisionshape(n):
-	#model and shapetype
-	attribs = [
-		{"name":"Shape Type","value":"TriangleMesh"},
-		{"name":"Material","value":"Material:Materials/"},
-	]
-	#model and materials for now
-	return attribs
-
-comp={
-	"StaticModel":c_staticmodel,
-	"RigidBody":c_rigidbody,
-	"CollisionShape":c_collisionshape,
-}
-
-def component_data(n,t):
-	#bring in the node, and the type
-	#then we offload the work to the functions per component
-	return comp[t](n)
+	#return comp[t](n)
 	#print "test"
+	return attribs
 
 #utility functions
 def strip_digits(s):
@@ -112,7 +96,7 @@ def seek_component(n,data):
 			if(trim[0]=='COMP'):
 				#it is a component, now I can do what i need spcifically with this
 				ctype = strip_string( strip_digits(nnode.name()), 'COMP_')
-				data.append(gen_component(component_data(nnode,ctype),ctype))
+				data.append(gen_component(component_data(nnode),ctype))
 				#print "COMPONENT: "+strip_string( strip_digits(nnode.name()), 'COMP_' )
 			elif(trim[0]=='NODE'):
 				#add the node as a child and carry on with the recursion
@@ -128,17 +112,24 @@ def collect_nodes():
 		#first we should check that we have selected a node that is a urho NODE
 		if n.type().nameComponents()[2] in ('null','merge'):
 			if(n.name().split("_")[0]=='NODE'):
+				#now lets find out where we want to save this bitch
+				path = hou.ui.selectFile(title="pick save location")
+				path = hou.expandString(path)
+
 				data = gen_node(node_data(n))
 				seek_component(n,data)
-				print tostring(data)
+
+				print(path+strip_string( strip_digits(n.name()), 'NODE_')+".xml")
+				WriteXml(data,path+strip_string( strip_digits(n.name()), 'NODE_')+".xml")
+				#print tostring(data)
+				#print xml.dump(node_data)
 			else:
 				print "ERROR: We expect the selected node to be labeled as NODE"
 		else:
 			print "ERROR: The selected nodes should be a null or merge. As well we expect the selected node to be labeled as NODE"
 		'''node = gen_node(node_data(n))
 		for transforms in n.inputs():#we should find a transform node first
-			node.append( gen_node(node_data(transforms.inputs()[0])) )'''
-		#print xml.dump(node)
+			node.append( gen_node(node_data(transforms.inputs()[0])) )'''		
 
 
 '''
