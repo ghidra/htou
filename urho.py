@@ -65,8 +65,8 @@ def write_mdl():
 			
 			
 			tVertex = TVertex()
-			tVertex.pos = Vector((hp[0], hp[1], hp[2]))
-			tVertex.normal = Vector((hn[0], hn[1], hn[2]))
+			tVertex.pos = Vector((-hp[0], hp[1], hp[2]))
+			tVertex.normal = Vector((-hn[0], hn[1], hn[2]))
 
 			#color
 			cd = geo.findPointAttrib("Cd")
@@ -112,8 +112,8 @@ def write_mdl():
 		pcount=0
 		for pr in geo.prims():
 			#the poly winding is reversed in urho compared to houdini, instead of requiring user to reverse in h, do it here
-			for v in reversed(pr.vertices()):
-			#for v in pr.vertices():
+			#for v in reversed(pr.vertices()):
+			for v in pr.vertices():
 				pcount+=1
 				indexBuffer.indexes.append( int(v.point().number()) )
 			#prcount+=1

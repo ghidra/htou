@@ -32,13 +32,13 @@ def test():
 def node_data(n):
 	t = n.outputs()[0]
 	q=hou.Quaternion()
-	q.setToEulerRotates( (t.parm("rx").eval(),t.parm("ry").eval(),t.parm("rz").eval()) )
+	q.setToEulerRotates( (t.parm("rx").eval(),-t.parm("ry").eval(),t.parm("rz").eval()) )
 	scl=hou.Vector3( (t.parm("sx").eval(),t.parm("sz").eval(),t.parm("sz").eval()) )
 	scl*=t.parm("scale").eval()
 	attribs = [
 		{"name":"Is Enabled","value":"true"},
 		{"name":"Name","value":n.name()[5:]},
-		{"name":"Position","value":str(t.parm("tx").eval())+" "+str(t.parm("ty").eval())+" "+str(t.parm("tz").eval())},
+		{"name":"Position","value":str(-t.parm("tx").eval())+" "+str(t.parm("ty").eval())+" "+str(t.parm("tz").eval())},
 		{"name":"Rotation","value":str(q[3])+" "+str(q[0])+" "+str(q[1])+" "+str(q[2])},
 		{"name":"Scale","value":str(scl[0])+" "+str(scl[1])+" "+str(scl[2])},
 		{"name":"Variables"}
