@@ -32,7 +32,7 @@ def test():
 def node_data(n):
 	t = n.outputs()[0]
 	q=hou.Quaternion()
-	q.setToEulerRotates( (t.parm("rx").eval(),-t.parm("ry").eval(),t.parm("rz").eval()) )
+	q.setToEulerRotates( (t.parm("rx").eval(),-t.parm("ry").eval(),-t.parm("rz").eval()) )
 	scl=hou.Vector3( (t.parm("sx").eval(),t.parm("sz").eval(),t.parm("sz").eval()) )
 	scl*=t.parm("scale").eval()
 	attribs = [

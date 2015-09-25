@@ -3,6 +3,45 @@ from urho_xml import strip_string
 from urho_xml import strip_digits
 
 #############
+def c_light(n):
+	group = n.parmTemplateGroup()
+	folder = hou.FolderParmTemplate("folder", "Static Model Component")
+
+	folder.addParmTemplate(hou.MenuParmTemplate("lighttype", "Light Type",("Directional","Spot","Point",),default_value=2))
+	folder.addParmTemplate(hou.FloatParmTemplate("color", "Color",4,(1.0,1.0,1.0,1.0,)))
+	folder.addParmTemplate(hou.FloatParmTemplate("specintensity", "Spec Intensity", 1, (1.0,) ) )
+	folder.addParmTemplate(hou.FloatParmTemplate("brightmult", "Brightness Multiplier", 1, (1.0,) ) )
+	folder.addParmTemplate(hou.FloatParmTemplate("range", "Range", 1, (10.0,) ) )
+	folder.addParmTemplate(hou.FloatParmTemplate("spotfov", "Spot FOV", 1, (30.0,) ) )
+	folder.addParmTemplate(hou.FloatParmTemplate("spotaspectratio", "Spot Aspect Ratio", 1, (1.0,) ) )
+	folder.addParmTemplate(hou.StringParmTemplate("atttext", "Attenuation Texture", 1))
+	folder.addParmTemplate(hou.StringParmTemplate("lightshapetext", "Light Shape Texture",1))
+	folder.addParmTemplate(hou.ToggleParmTemplate("isoccludable", "Can Be Occluded", 1))
+	folder.addParmTemplate(hou.ToggleParmTemplate("castshadows", "Cast Shadows", 0))
+	folder.addParmTemplate(hou.ToggleParmTemplate("prevertex", "Per Vertex", 0))
+	folder.addParmTemplate(hou.FloatParmTemplate("drawdistance", "Draw Distance", 1 ) )
+	folder.addParmTemplate(hou.FloatParmTemplate("fadedistance", "Fade Distance", 1 ) )
+	folder.addParmTemplate(hou.FloatParmTemplate("shadowdistance", "Shadow Distance", 1 ) )
+	folder.addParmTemplate(hou.FloatParmTemplate("shadowfadedistance", "Shadow Fade Distance", 1 ) )
+	folder.addParmTemplate(hou.FloatParmTemplate("shadowintensity", "Shadow Intensity", 1 ) )
+	folder.addParmTemplate(hou.FloatParmTemplate("shadowresolution", "Shadow Resolution", 1 ) )
+	folder.addParmTemplate(hou.ToggleParmTemplate("focustoscene", "Focus To Scene", 1))
+	folder.addParmTemplate(hou.ToggleParmTemplate("nonuniformview", "Non Uniform View", 1))
+	folder.addParmTemplate(hou.ToggleParmTemplate("autoreducesize", "Auto Reduce Size", 1))
+	folder.addParmTemplate(hou.FloatParmTemplate("cmssplits", "CMS Splits",3,(1000.0,0.0,0.0,)))
+	folder.addParmTemplate(hou.FloatParmTemplate("cmsfadestart", "CMS Fade Start", 1, (0,8,) ) )
+	folder.addParmTemplate(hou.FloatParmTemplate("cmsbiasautoadjust", "CMS Bias Auto Adjust", 1, (1.0,) ) )
+	folder.addParmTemplate(hou.FloatParmTemplate("viewsizequantize", "View Size Quantize", 1, (0.5,) ) )
+	folder.addParmTemplate(hou.FloatParmTemplate("viewsizemin", "View Size Minimum", 1, (1.0,) ) )
+	folder.addParmTemplate(hou.FloatParmTemplate("depthconstantbias", "Depth Constant Bias", 1, (0.0002,) ) )
+	folder.addParmTemplate(hou.FloatParmTemplate("depthslopebias", "Depth Slope Bias", 1, (0.5,) ) )
+	folder.addParmTemplate(hou.FloatParmTemplate("nearfarclip", "Near Far Clip Ratio", 1, (0.002,) ) )
+	folder.addParmTemplate(hou.IntParmTemplate("viewmask", "View Mask",1,(-1,)))
+	folder.addParmTemplate(hou.IntParmTemplate("lightmask", "Light Mask",1,(-1,)))
+
+	group.append(folder)
+	n.setParmTemplateGroup(group)
+
 def c_staticmodel(n):
 	group = n.parmTemplateGroup()
 	folder = hou.FolderParmTemplate("folder", "Static Model Component")
@@ -83,6 +122,7 @@ def c_collisionshape(n):
 
 #######
 comp={
+	"Light":c_light,
 	"StaticModel":c_staticmodel,
 	"RigidBody":c_rigidbody,
 	"CollisionShape":c_collisionshape,
