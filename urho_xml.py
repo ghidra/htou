@@ -59,6 +59,11 @@ def component_data(n):
 			if(p.parmTemplate().type() == hou.parmTemplateType.Menu):
 				sub["value"] = p.menuLabels()[p.eval()]
 				#print sub["value"]
+			elif(p.parmTemplate().type() == hou.parmTemplateType.Toggle):
+				if(p.evalAsString()=='on'):
+					sub["value"] = 'true'
+				else:
+					sub["value"] = 'false'
 			else:
 				if p.description() in ("Model","Material"):
 					#i have to prepend this for these
