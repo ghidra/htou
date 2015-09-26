@@ -30,7 +30,7 @@ Put the python scripts in your houdini user folder, usually ~/houdini[version]/s
 			<li>Rigid Body</li>
 			<li>"Light"</li>
 		</ul>
-<ul>
+</ul>
 
 Each respective shelf tool uses the following python:
 
