@@ -57,11 +57,10 @@ Meshes
 --
 ![alt tag](https://cloud.githubusercontent.com/assets/5643219/10115771/99eadcde-63e3-11e5-84cd-669a49a0ac46.png)
 
-
-select nodes (from inside a SOP) that you want to export as mdl, and push the shelf tool button.
+Select nodes (from inside a SOP) that you want to export as mdl, and push the shelf tool button.
 <ul>
 <li>Mdls will be names based on the node selected.</li>
-<li>To be safe, Triangulate you mesh.</li>
+<li>To be safe, Triangulate your mesh.</li>
 <li>All attributes are read at the point context.</li>
 <li>You MUST have normals at the point context.</li>
 <li>Supports Cd, for vertex color.</li>
@@ -76,7 +75,35 @@ select nodes (from inside a SOP) that you want to export as mdl, and push the sh
   </ul>
 </ul>
 
-----
+Components
+--
+![alt tag](https://cloud.githubusercontent.com/assets/5643219/10115773/99ebdcc4-63e3-11e5-8691-407fafb26a91.png)
+
+Node should be either a "null" or a "merge", namedd COMP_*, where * is the component type. Select the node and use the shelf tool "urho component" to add the relevant parameters.
+
+![alt tag](https://cloud.githubusercontent.com/assets/5643219/10115774/99ec93c6-63e3-11e5-99fe-71bf433cbfc5.png)
+
+Here the same Static Mesh component is being used in 4 differen Nodes. Nodes can be either a null or merge but must be named "Node_*" where * will be the name of the node. Followed by a transform, that will be the transform information of the  Node in urho.
+
+![alt tag](https://cloud.githubusercontent.com/assets/5643219/10115772/99eb8486-63e3-11e5-95d3-32489c28fdf7.png)
+
+This is some moss generated from the 4 rocks, that later is all merged into another node.
+
+![alt tag](https://cloud.githubusercontent.com/assets/5643219/10115775/99ed2f02-63e3-11e5-9999-6707c04a4fe8.png)
+![alt tag](https://cloud.githubusercontent.com/assets/5643219/10115776/99eff732-63e3-11e5-9410-34ad5544b6ad.png)
+
+And finally the last node
+
+Select the final node (not the transform), and use the shelf tool "urho scene" to save out the prefab. It will prompt you to select a folder you want to save into. It will use the name of the node, sans the "NODE_" prefix.
+
+This can be loaded into Urho3D.
+
+Urho3D
+--
+![alt tag](https://cloud.githubusercontent.com/assets/5643219/10115778/a16778be-63e3-11e5-9396-69be244acd45.png)
+![alt tag](https://cloud.githubusercontent.com/assets/5643219/10115781/a1694eaa-63e3-11e5-8cb7-6d280fde326a.png)
+![alt tag](https://cloud.githubusercontent.com/assets/5643219/10115779/a1681b0c-63e3-11e5-86ea-d913d1eec54b.png)
+
 To do:<br/>
 
 Bones, and Animation. LODs. Vertex Morphs.
