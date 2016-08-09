@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shelfDocument>
+  <!-- This file contains definitions of shelves, toolbars, and tools.
+ It should not be hand-edited when it is being used by the application.
+ Note, that two definitions of the same element are not allowed in
+ a single file. -->
+
+  <toolshelf name="urho3d" label="Urho3D">
+    <memberTool name="urhomesh"/>
+    <memberTool name="urhoscene"/>
+    <memberTool name="urhocomponent"/>
+  </toolshelf>
+
+  <tool name="urhomesh" label="Urho Mesh" icon="PLASMA_App">
+    <script scriptType="python"><![CDATA[import urho
+reload(urho)
+
+urho.write_mdl()]]></script>
+  </tool>
+
+  <tool name="urhoscene" label="Urho Scene" icon="PLASMA_App">
+    <script scriptType="python"><![CDATA[import urho_xml
+reload(urho_xml)
+
+urho_xml.collect_nodes()]]></script>
+  </tool>
+
+  <tool name="urhocomponent" label="Urho Component" icon="PLASMA_App">
+    <script scriptType="python"><![CDATA[import urho_component
+reload(urho_component)
+
+urho_component.make_parms()]]></script>
+  </tool>
+</shelfDocument>
